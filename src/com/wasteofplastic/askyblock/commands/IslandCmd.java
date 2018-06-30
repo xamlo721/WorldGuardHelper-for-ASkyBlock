@@ -2120,7 +2120,7 @@ TabCompleter {
                                 return true;
                             }
                             if (CoopPlay.getInstance().addCoopPlayer(player, target2)) {
-                                WGHelper.addMember(player.getName(), target2.getName());
+                                WGHelper.addMember(target2.getName(), player.getName());
                                 Util.sendMessage((CommandSender)player, ChatColor.GREEN + this.plugin.myLocale(player.getUniqueId()).coopSuccess.replace("[name]", target2.getName()));
                                 Util.sendMessage((CommandSender)target2, ChatColor.GREEN + this.plugin.myLocale(targetPlayerUUID2).coopMadeYouCoop.replace("[name]", player.getName()));
                             }
@@ -2151,7 +2151,7 @@ TabCompleter {
                                 return true;
                             }
                             final boolean coop = CoopPlay.getInstance().removeCoopPlayer(player, targetPlayerUUID);
-                            WGHelper.RemoveMember(player.getName(), Bukkit.getOfflinePlayer(targetPlayerUUID).getName());
+                            WGHelper.RemoveMember(Bukkit.getOfflinePlayer(targetPlayerUUID).getName(), player.getName());
                             if (coop) {
                                 if (target3 != null) {
                                     Util.sendMessage((CommandSender)target3, ChatColor.RED + this.plugin.myLocale(target3.getUniqueId()).coopRemoved.replace("[name]", player.getName()));
