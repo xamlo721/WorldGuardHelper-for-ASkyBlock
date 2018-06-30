@@ -2549,11 +2549,17 @@ TabCompleter {
         if (pvp) {
             Util.sendMessage((CommandSender)player, (Object)ChatColor.BOLD + "" + (Object)ChatColor.RED + this.plugin.myLocale((UUID)player.getUniqueId()).igs.get((Object)Island.SettingsFlag.PVP) + " " + this.plugin.myLocale((UUID)player.getUniqueId()).igsAllowed);
             if (this.plugin.getServer().getVersion().contains("(MC: 1.8") || this.plugin.getServer().getVersion().contains("(MC: 1.7")) {
-                player.getWorld().playSound(player.getLocation(), Sound.valueOf((String)"ARROW_HIT"), 1.0f, 1.0f);
-            } 
+                player.getWorld().playSound(player.getLocation(), Sound.valueOf("ARROW_HIT"), 1.0f, 1.0f);
+            }
+            else {//Подсосите новую версию bukkit, чтобы это пофиксить
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
+            }
         } else if (this.plugin.getServer().getVersion().contains("(MC: 1.8") || this.plugin.getServer().getVersion().contains("(MC: 1.7")) {
-            player.getWorld().playSound(player.getLocation(), Sound.valueOf((String)"BAT_TAKEOFF"), 1.0f, 1.0f);
-        }
+            	player.getWorld().playSound(player.getLocation(), Sound.valueOf("BAT_TAKEOFF"), 1.0f, 1.0f);
+        	  }
+        		else {//Подсосите новую версию bukkit, чтобы это пофиксить
+        			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BAT_TAKEOFF, 1.0f, 1.0f);
+        	}
         Player warpOwner = this.plugin.getServer().getPlayer(foundWarp);
         if (warpOwner != null && !warpOwner.equals((Object)player)) {
             Util.sendMessage((CommandSender)warpOwner, this.plugin.myLocale((UUID)foundWarp).warpsPlayerWarped.replace("[name]", player.getName()));
