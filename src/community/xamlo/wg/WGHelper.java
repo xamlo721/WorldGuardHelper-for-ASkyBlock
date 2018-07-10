@@ -2,6 +2,7 @@ package community.xamlo.wg;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
@@ -34,7 +35,7 @@ public class WGHelper {
 
 	static WorldGuardPlugin worldGuard = WGHelper.getWorldGuard();
 	static RegionManager regionManager = worldGuard.getRegionManager(Bukkit.getWorld("ASkyBlock"));
-	static RegionManager NetherRegionManager = worldGuard.getRegionManager(Bukkit.getWorld("ASkyBlock_nether"));
+	static RegionManager netherRegionManager = worldGuard.getRegionManager(Bukkit.getWorld("ASkyBlock_nether"));
 	
 	public static WorldGuardPlugin getWorldGuard() {
         Plugin plugin = Bukkit.getPluginManager().getPlugin( "WorldGuard" );
@@ -82,8 +83,8 @@ public class WGHelper {
 				region.setFlag((Flag) DefaultFlag.FAREWELL_MESSAGE,(Object) DefaultFlag.FAREWELL_MESSAGE.parseInput(WGHelper.getWorldGuard(), sender,"\u00a7d** You are leaving \u00a7b" + sender.getName() + " \u00a7disland."));
 				return region;
 			}
-			Util.sendMessage((CommandSender) sender, "Чо, пацаны, NPE???");
-
+			Util.sendMessage((CommandSender) sender, "NPE ловим???");
+			saveAllRegions();
 			return null;
 		} catch (InvalidFlagFormat e) {
 			e.printStackTrace();
@@ -97,11 +98,13 @@ public class WGHelper {
         ProtectedCuboidRegion region = WGHelper.setRegionFlags(sender, regionName);
         regionManager.addRegion((ProtectedRegion)region);
         protectNetherIsland(sender);
+		saveAllRegions();
 	}
 	public static void protectNetherIsland(CommandSender sender) {
 		String regionName = sender.getName() + "_island";
 		ProtectedCuboidRegion region = WGHelper.setRegionFlags(sender, regionName);
-		NetherRegionManager.addRegion((ProtectedRegion) region);
+		netherRegionManager.addRegion((ProtectedRegion) region);
+		saveAllRegions();
 	}
     public static BlockVector getProtectionVectorLeft(Location island) {
         return new BlockVector(island.getX() + (double)50 - 1.0, 255.0, island.getZ() + (double)50 - 1.0);
@@ -111,27 +114,40 @@ public class WGHelper {
     }
   
     public static void addMember( String member, String sender) {
-		ProtectedCuboidRegion region = (ProtectedCuboidRegion) regionManager.getRegion(sender);
-		ProtectedCuboidRegion netherRegion = (ProtectedCuboidRegion) NetherRegionManager.getRegion(sender);
+		ProtectedCuboidRegion region = (ProtectedCuboidRegion) regionManager.getRegion(sender + "_island");
+		ProtectedCuboidRegion netherRegion = (ProtectedCuboidRegion) netherRegionManager.getRegion(sender + "_island");
 
 		region.getMembers().addPlayer(member);
 		netherRegion.getMembers().addPlayer(member);
+		saveAllRegions();
     }
     public static void RemoveMember( String member, String sender) {
-		ProtectedCuboidRegion region = (ProtectedCuboidRegion) regionManager.getRegion(sender);
-		ProtectedCuboidRegion netherRegion = (ProtectedCuboidRegion) NetherRegionManager.getRegion(sender);
+		ProtectedCuboidRegion region = (ProtectedCuboidRegion) regionManager.getRegion(sender + "_island");
+		ProtectedCuboidRegion netherRegion = (ProtectedCuboidRegion) netherRegionManager.getRegion(sender + "_island");
 
 		region.getMembers().removePlayer(member);
-		netherRegion.getMembers().removePlayer(member);  	
+		netherRegion.getMembers().removePlayer(member); 
+		saveAllRegions();
     }
     
     public static void deleteProtectedRegion(CommandSender sender ) {
     	if (regionManager.getRegion(sender.getName()+"_island") != null)
     		regionManager.removeRegion(sender.getName()+"_island");
 		deleteNetherProtectedRegion(sender);
+		saveAllRegions();
     }
     public static void deleteNetherProtectedRegion(CommandSender sender ) {
-    	if (NetherRegionManager.getRegion(sender.getName()+"_island") != null)
-    		NetherRegionManager.removeRegion(sender.getName()+"_island");
-    }	
+    	if (netherRegionManager.getRegion(sender.getName()+"_island") != null)
+    		netherRegionManager.removeRegion(sender.getName()+"_island");
+    	saveAllRegions();
+    }
+    //suport WG 5.9.1
+    private static void saveAllRegions(){
+    	try {
+			regionManager.save();
+	    	netherRegionManager.save();
+		} catch (ProtectionDatabaseException e) {
+			e.printStackTrace();
+		}
+    }
 }
